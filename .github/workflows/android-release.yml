@@ -9,6 +9,15 @@ on:
 
 jobs:
   build:
+    environment: env
+    env:
+      SIGNING_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
+      SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+      GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+      GOOGLE_SERVICE_INFO: ${{ secrets.GOOGLE_SERVICE_INFO }}
+      FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,21 +30,21 @@ jobs:
       - name: Get key_store from b64
         id: android_keystore
         run: |
-          echo "${{ $SIGNING_KEYSTORE }}" | base64 --decode > android/app/key_store.jks
+          echo "${{ env.SIGNING_KEYSTORE }}" | base64 --decode > android/app/key_store.jks
           echo "::set-output name=filePath::key_store.jks" 
 
       - name: Setup key.properties
         run: |
           echo "storeFile=${{ steps.android_keystore.outputs.filePath }}" > android/key.properties
-          echo "storePassword=${{ $SIGNING_KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "keyPassword=${{ $SIGNING_KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ $SIGNING_KEY_ALIAS }}" >> android/key.properties
+          echo "storePassword=${{ env.SIGNING_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ env.SIGNING_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ env.SIGNING_KEY_ALIAS }}" >> android/key.properties
 
       - name: Setting up firebase
         run: | 
-          echo "${{ $GOOGLE_SERVICES }}"     | base64 --decode > android/app/google-services.json
-          echo "${{ $GOOGLE_SERVICE_INFO }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
-          echo "${{ $FIREBASE_OPTIONS }}"    | base64 --decode > lib/firebase_options.dart
+          echo "${{ env.GOOGLE_SERVICES }}"     | base64 --decode > android/app/google-services.json
+          echo "${{ env.GOOGLE_SERVICE_INFO }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
+          echo "${{ env.FIREBASE_OPTIONS }}"    | base64 --decode > lib/firebase_options.dart
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -59,7 +68,7 @@ jobs:
         uses: marvinpinto/action-automatic-releases@latest
 
         with:
-          repo_token: ${{ $GITHUB_TOKEN }}
+          repo_token: ${{ env.GITHUB_TOKEN }}
           automatic_release_tag: ${{ steps.version.outputs.version }}
           title: "Release ${{ steps.version.outputs.version }}"
           prerelease: false
