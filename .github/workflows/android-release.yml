@@ -20,6 +20,29 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+      
+
+
+
+
+
+      - name: Get key_store from b64
+        id: android_keystore
+        run: |
+          echo "${{ secrets.SIGNING_KEYSTORE }}" | base64 --decode > android/app/key_store.jks
+          echo "::set-output name=filePath::key_store.jks"
+
+      - name: Setup key.properties
+        run: |
+          echo "storeFile=${{ steps.android_keystore.outputs.filePath }}" > android/key.properties
+          echo "storePassword=${{ secrets.SIGNING_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.SIGNING_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.SIGNING_KEY_ALIAS }}" >> android/key.properties
+
+
+
+
+
 
       - name: Setting up firebase
         run: | 
