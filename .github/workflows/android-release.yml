@@ -51,7 +51,7 @@ jobs:
           cache: false
 
       
-
+      - run: flutter clean
       - run: flutter pub get
       - run: flutter build apk
 
