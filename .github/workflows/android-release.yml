@@ -22,7 +22,7 @@ jobs:
         id: android_keystore
         run: |
           echo "${{ secrets.SIGNING_KEYSTORE }}" | base64 --decode > android/app/key_store.jks
-          echo "::set-output name=filePath::key_store.jks"
+          echo "::set-output name=filePath::key_store.jks" 
 
       - name: Setup key.properties
         run: |
